@@ -1,0 +1,37 @@
+<project name="TSPVertex" basedir="." default="main">
+
+    <property name="src.dir"     value="src"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="."/>
+    <property name="jar-name"    value="${ant.project.name}.jar"/>
+    <property name="main-class"  value="project4"/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete file="${jar-name}"/>
+        <delete>
+            <fileset dir="." includes="*.txt.tour"/>
+        </delete>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${jar-name}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,jar"/>
+
+</project>
