@@ -1,21 +1,17 @@
 import java.io.*;
-import java.util.Scanner;
-import java.util.PriorityQueue;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Hashtable;
 
 //this class acts as a test harness to check for the correctness of the 4 different find max sub-array algorithms
 public class project4 {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException 
+	{
 		
 //		String output = args[0] + ".txt.tour";
 		
 		
 		String path = "test-input-1.txt";//args[0] + ".txt";
-		
 		Vertex[] theGraph = parseGraph(path);
 		
 		int[][] distances = getDistances(theGraph);
@@ -25,15 +21,11 @@ public class project4 {
 		
 		ArrayList<Vertex> unitedList = min_weight_and_unite(MinimumSpanningTree, distances);
 		updateEdges(unitedList);
+		
 		Hierholzer Hierholzer = new Hierholzer(unitedList, distances);
 		LinkedList<Vertex> eulerTour =     Hierholzer.run();
 		
-		System.out.println("total size of tour is : " + eulerTour.size());
-		for(int i = 0; i < eulerTour.size(); i++)
-		{
-			System.out.println(eulerTour.get(i).getID());
-		}
-	
+		System.out.println("total size of tour is : " + eulerTour.size());	
 	}
 	
 /*
@@ -195,16 +187,6 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 		}
 	}
 	
-	for(int i = 0; i < evenNumbers.size(); i++)
-	{
-		if(evenNumbers.get(i).getID() == 9)
-		{
-			System.out.println(evenNumbers.get(i).connectedVertices.size());
-		}
-	}
-
-
-	
 // This block of code will separate even vertexes who have been made odd (and thus need to be mated)
 // and even numbers who are zero.
 	ArrayList<Integer> evenNumberNowOdd        =  new ArrayList<Integer>();
@@ -288,7 +270,8 @@ while(oddNumbersPaired.isEmpty() == false)
 	
 	int distanceCheckOddOneIndex = -1;
 	int distanceCheckOddTwoIndex = -1;
-	int combinedDistancesOdd = Integer.MAX_VALUE;
+
+	//int combinedDistancesOdd = Integer.MAX_VALUE;
 	for(int i = 0; i < evenNumberOddVertex.size(); i++)
 	{
 		for(int j = 0; j < evenNumberOddVertex.size(); j++)
@@ -444,7 +427,6 @@ ArrayList<Integer> EdgeCaseNumbers = new ArrayList<Integer>(); // for while loop
 ArrayList<Vertex>  ZeroReadyToAdd  = new ArrayList<Vertex>();
 
 
-System.out.println(zeroReadyToPair.get(0).getID());
 while(zeroReadyToPair.isEmpty() == false)
 {
     int edgeCase = -1;
@@ -523,16 +505,16 @@ while(ZeroReadyToAdd.isEmpty() == false)
 	ZeroReadyToAdd.remove(0);
 }
 
+/*Debugging script
 for(int i = 0; i < evenNumbers.size(); i ++)
 {
 	if(evenNumbers.get(i).connectedVertices.size() % 2 == 1)
 	{
-		System.out.println("dammit");
+		System.out.println("ERROR: even numbers vertex contains an odd number");
 		
 	}
 }
-
-System.out.println(evenNumberOddVertex.get(0).getID());
+*/
 while(evenNumberOddVertex.isEmpty() == false)
 {
 	
@@ -592,7 +574,7 @@ while(evenNumberOddVertex.isEmpty() == false)
 	evenNumberOddVertex.remove(0);	
 }
 
-
+/*Debugging Script
 for(int i = 0; i < evenNumbers.size(); i++)
 {
 	ArrayList<Integer> children = new ArrayList<Integer>();
@@ -600,7 +582,7 @@ for(int i = 0; i < evenNumbers.size(); i++)
 	{
 		if(children.contains(evenNumbers.get(i).connectedVertices.get(j).child))
 		{
-			System.out.println("oh rats");
+			System.out.println("Duplicate value found.");
 		}
 		else
 		{
@@ -609,7 +591,7 @@ for(int i = 0; i < evenNumbers.size(); i++)
 		
 	}
 }
-
+*/
 
 
 
@@ -620,9 +602,6 @@ for(int i = 0; i < evenNumbers.size(); i++)
 
 return evenNumbers;
 }
-
-
-
 
 static void updateEdges(ArrayList<Vertex> updateEdges)
 {
