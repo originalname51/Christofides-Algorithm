@@ -23,9 +23,16 @@ public class project4 {
 		updateEdges(unitedList);
 		
 		Hierholzer Hierholzer = new Hierholzer(unitedList, distances);
-		LinkedList<Vertex> eulerTour =     Hierholzer.run();
-		
+		LinkedList<Vertex> eulerTour =     Hierholzer.run();		
 		System.out.println("total size of tour is : " + eulerTour.size());	
+		
+		ShortCut answer = new ShortCut(eulerTour);
+		
+		ArrayList<Vertex> TSP = answer.run();
+			
+		System.out.println("Total size of the TSP is: " + TSP.size());
+		FinalAnswer(TSP, distances);
+	
 	}
 	
 /*
@@ -621,5 +628,18 @@ static void updateEdges(ArrayList<Vertex> updateEdges)
 		}
 	}
 }
-
+static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances)
+{
+	int totalDistance = 0;
+	for(int i = 0; i < TSP.size()-1; i++)
+	{
+		System.out.println(TSP.get(i).getID());
+		totalDistance+= distances[TSP.get(i).getID()][TSP.get(i+1).getID()];
+	}
+	
+	System.out.println("Total distance covered is: " + totalDistance);
 }
+}
+
+
+
