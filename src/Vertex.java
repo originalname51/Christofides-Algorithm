@@ -11,6 +11,7 @@ public class Vertex
 	   
 	   int     parentID;
 	   int     weightCost;
+	   boolean evenEdge;
 	   
 	   public Vertex(int id, int x_var, int y_var)
 	   {	   

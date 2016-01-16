@@ -11,7 +11,8 @@ public class project4 {
 //		String output = args[0] + ".txt.tour";
 		
 		
-		String path = "test-input-1.txt";//args[0] + ".txt";
+		String path = args[0];
+		
 		Vertex[] theGraph = parseGraph(path);
 		
 		int[][] distances = getDistances(theGraph);
@@ -31,7 +32,7 @@ public class project4 {
 		ArrayList<Vertex> TSP = answer.run();
 			
 		System.out.println("Total size of the TSP is: " + TSP.size());
-		FinalAnswer(TSP, distances);
+		FinalAnswer(TSP, distances, args[0]);
 	
 	}
 	
@@ -131,17 +132,9 @@ static Vertex [] parseGraph(String in) throws IOException
 	
 
 	/*
-	 * 
-	 * This takes in the minimum Spanning Tree and distances. 
-	 * This is a quick and dirty version. Target version is 
-	 * http://dcg.ethz.ch/publications/ctw04.pdf
-	 * 
-	 * The version below works by taking all odd numbered vertexes and removing all odd vertex edges. It then keeps track of even edges
-	 * and through smoke and mirrors produce a graph of all even numbered vertices.
-	 * 
-	 * From there, it will take the closest odd vertex in order to attempt a minimum wait fully matching tree. 
-	 * This is not fully matching and needs to be re-written at a later date but both Blossom algorithm and the ctw04 algorithm are difficult to 
-	 * implement and the gain in performance does not seem to be huge(based off initial implementation).
+	This splits even and odds from each other and then creates a "perfect matching" (it doesn't actually, 
+	but attempts something close to), and then reconnects the graph. Please note this creates a Eulerian Multigraph
+	which means edges can be connected to each other twice. A-B A-B can exist.
 	 * */
 	
 static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningTree, int [][] distances)
@@ -149,10 +142,6 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 	ArrayList<Vertex> oddNumbersUnpaired           = new ArrayList<Vertex>();
 	ArrayList<Vertex> oddNumbersPaired             = new ArrayList<Vertex>();
 	ArrayList<Vertex> evenNumbers                  = new ArrayList<Vertex>();
-	ArrayList<Integer> oddNumberVertexID           = new ArrayList<Integer>();
-	ArrayList<Integer> evenNumberVertexID 		   = new ArrayList<Integer>();
-	
-	
 	
 	//This will separate the MinimumSPanningTree into an odd half and an even half of vertices.
 	
@@ -161,62 +150,14 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 		if(MinimumSpanningTree.get(i).connectedVertices.size() % 2 == 1)
 		{
 			oddNumbersUnpaired.add(MinimumSpanningTree.get(i));
-			oddNumberVertexID.add(MinimumSpanningTree.get(i).getID());
-
+			MinimumSpanningTree.get(i).evenEdge = false;
 		}
 		else
 		{
 			evenNumbers.add(MinimumSpanningTree.get(i));
-			evenNumberVertexID.add(MinimumSpanningTree.get(i).getID());
-
+			MinimumSpanningTree.get(i).evenEdge = true;
 		}
 	}
-	
-
-		
-	
-//Isolate odd vertex
-	
-	for(int i = 0; i < oddNumbersUnpaired.size(); i++)
-	{
-		oddNumbersUnpaired.get(i).connectedVertices.clear();
-	}
-
-//remove even connection to odd vertex
-	for(int i = 0; i < evenNumbers.size(); i++)
-	{
-		for(int j = evenNumbers.get(i).connectedVertices.size()-1; j > -1; j--)
-		{
-			if(oddNumberVertexID.contains(evenNumbers.get(i).connectedVertices.get(j).child))
-			{
-				evenNumbers.get(i).connectedVertices.remove(j);
-			}
-		}
-	}
-	
-// This block of code will separate even vertexes who have been made odd (and thus need to be mated)
-// and even numbers who are zero.
-	ArrayList<Integer> evenNumberNowOdd        =  new ArrayList<Integer>();
-	ArrayList<Integer> evenNumberNowZero       =  new ArrayList<Integer>();
-	ArrayList<Vertex>  evenNumberOddVertex     = new ArrayList<Vertex>();
-	ArrayList<Vertex>  evenNumberNowZeroVertex = new ArrayList<Vertex>();
-	
-	for(int i = evenNumbers.size()-1; i > -1; i--)
-	{
-		if(evenNumbers.get(i).connectedVertices.size() % 2 == 1)
-		{
-			evenNumberOddVertex.add(evenNumbers.get(i));
-			evenNumberNowOdd.add(evenNumbers.get(i).getID());
-			evenNumbers.remove(i);
-
-		}
-		else if(evenNumbers.get(i).connectedVertices.size() == 0)
-		{
-			evenNumberNowZeroVertex.add(evenNumbers.get(i));
-			evenNumberNowZero.add(evenNumbers.get(i).getID());
-			evenNumbers.remove(i);
-		}
-	}		
 
 //This will create edges between two odd vertices.
 	while(oddNumbersUnpaired.isEmpty() == false)
@@ -251,361 +192,11 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 	}
 	
 //combine the odd vertex's to even vertexes.	
-	
-ArrayList<Vertex> oddNumbersToCombine      = new ArrayList<Vertex>();
 while(oddNumbersPaired.isEmpty() == false)
 {
-	int combinedDistances = Integer.MAX_VALUE;
-	
-	int vertexIDOne       = oddNumbersPaired.get(0).getID();	//Because index at 0 and 1 have been organized to be connected
-	int vertexIDTwo 	  = oddNumbersPaired.get(1).getID();	//These are the perfect matching odd numbers.
-	int indexToConnect    = -1;
-    boolean evenConnected = true;
-	
-	for(int i = 0; i < evenNumbers.size(); i++)
-	{
-			int distanceOne 			= distances[vertexIDOne][evenNumbers.get(i).getID()];
-			int distanceTwo 			= distances[vertexIDTwo][evenNumbers.get(i).getID()];
-			int checkCombinedDistances  = distanceOne + distanceTwo;
-			
-			if(checkCombinedDistances < combinedDistances)
-			{
-				combinedDistances = checkCombinedDistances;
-				indexToConnect    = i;
-			}		
-	}
-	
-	int distanceCheckOddOneIndex = -1;
-	int distanceCheckOddTwoIndex = -1;
-
-	//int combinedDistancesOdd = Integer.MAX_VALUE;
-	for(int i = 0; i < evenNumberOddVertex.size(); i++)
-	{
-		for(int j = 0; j < evenNumberOddVertex.size(); j++)
-		{
-			if(evenNumberOddVertex.get(j).getID() != evenNumberOddVertex.get(i).getID())
-			{
-				int distanceOne = distances[vertexIDOne][evenNumberOddVertex.get(i).getID()];
-				int distanceTwo = distances[vertexIDTwo][evenNumberOddVertex.get(j).getID()];
-				int checkOneWay = distanceOne + distanceTwo;
-			
-				int distanceCheckOtherOne = distances[vertexIDOne][evenNumberOddVertex.get(j).getID()];
-				int distanceCheckOtherTwo = distances[vertexIDTwo][evenNumberOddVertex.get(i).getID()];
-				int checkTheOtherWay      = distanceCheckOtherOne + distanceCheckOtherTwo;
-			
-				if(checkOneWay < checkTheOtherWay)
-				{
-					if(checkOneWay < combinedDistances)
-					{
-						evenConnected = false;
-						distanceCheckOddOneIndex = i;
-						distanceCheckOddTwoIndex = j;
-					}
-				}
-				else
-				{
-					if(checkTheOtherWay < combinedDistances)
-					{
-						evenConnected = false;
-						distanceCheckOddOneIndex = j;
-						distanceCheckOddTwoIndex = i;
-					}
-				}
-			}
-		}
-	}
-	
-	
-	
-	if(evenConnected == true)
-	{	
-	Edge vertexIDOneConnector 			= new Edge(vertexIDOne, evenNumbers.get(indexToConnect).getID(), distances[vertexIDOne][indexToConnect]);
-	Edge vertexEvenIDOneConnector 		= new Edge(evenNumbers.get(indexToConnect).getID(), vertexIDOne, distances[vertexIDOne][indexToConnect]);
-	Edge vertexIDTwoConnector			= new Edge(vertexIDTwo, evenNumbers.get(indexToConnect).getID(), distances[vertexIDTwo][indexToConnect]);		
-	Edge vertexEvenIDTwoConnector       = new Edge(evenNumbers.get(indexToConnect).getID(),vertexIDTwo, distances[vertexIDTwo][indexToConnect]);
-	
-	oddNumbersPaired.get(0).connectedVertices.add(vertexIDOneConnector);
-	oddNumbersPaired.get(1).connectedVertices.add(vertexIDTwoConnector);
-	
-	evenNumbers.get(indexToConnect).connectedVertices.add(vertexEvenIDOneConnector);
-	evenNumbers.get(indexToConnect).connectedVertices.add(vertexEvenIDTwoConnector);
-
-	oddNumbersToCombine.add(oddNumbersPaired.get(0));
-	oddNumbersToCombine.add(oddNumbersPaired.get(1));
-	
-	oddNumbersPaired.remove(1);
-	oddNumbersPaired.remove(0);	
-	}
-	else //this reconnects an odd even vertex to the graph...
-	{
-		Edge vertexIDOneConnector = 
-		new Edge(vertexIDOne, evenNumberOddVertex.get(distanceCheckOddOneIndex).getID(), distances[vertexIDOne][evenNumberOddVertex.get(distanceCheckOddOneIndex).getID()]);
-		Edge vertexEvenIDOneConnector =
-		new Edge(evenNumberOddVertex.get(distanceCheckOddOneIndex).getID(),vertexIDOne, distances[vertexIDOne][evenNumberOddVertex.get(distanceCheckOddOneIndex).getID()]);
-		Edge vertexIDTwoConnector =
-		new Edge(vertexIDTwo, evenNumberOddVertex.get(distanceCheckOddTwoIndex).getID(), distances[vertexIDTwo][evenNumberOddVertex.get(distanceCheckOddTwoIndex).getID()]);
-		Edge vertexEvenIDTwoConnector  =
-		new Edge(evenNumberOddVertex.get(distanceCheckOddTwoIndex).getID(),vertexIDTwo, distances[vertexIDTwo][evenNumberOddVertex.get(distanceCheckOddTwoIndex).getID()]);
-
-		oddNumbersPaired.get(0).connectedVertices.add(vertexIDOneConnector);
-		oddNumbersPaired.get(1).connectedVertices.add(vertexIDTwoConnector);	
-	
-		evenNumberOddVertex.get(distanceCheckOddOneIndex).connectedVertices.add(vertexEvenIDOneConnector);
-		evenNumberOddVertex.get(distanceCheckOddTwoIndex).connectedVertices.add(vertexEvenIDTwoConnector);
-		
-		oddNumbersToCombine.add(oddNumbersPaired.get(0));
-		oddNumbersToCombine.add(oddNumbersPaired.get(1));
-		
-		oddNumbersPaired.remove(1);
-		oddNumbersPaired.remove(0);	
-		
-		evenNumbers.add(evenNumberOddVertex.get(distanceCheckOddOneIndex));
-		evenNumbers.add(evenNumberOddVertex.get(distanceCheckOddTwoIndex));
-		
-		if(distanceCheckOddOneIndex > distanceCheckOddTwoIndex)
-		{
-			evenNumberOddVertex.remove(distanceCheckOddOneIndex);
-			evenNumberOddVertex.remove(distanceCheckOddTwoIndex);
-
-		}
-		else
-		{
-			evenNumberOddVertex.remove(distanceCheckOddTwoIndex);
-			evenNumberOddVertex.remove(distanceCheckOddOneIndex);
-
-		}
-	}
+	evenNumbers.add(oddNumbersPaired.get(0));
+	oddNumbersPaired.remove(0);
 }
-
-while(oddNumbersToCombine.isEmpty() == false)
-{
-	evenNumbers.add(oddNumbersToCombine.get(0));
-	oddNumbersToCombine.remove(0);
-}
-
-
-
-//make evenNumbeNowZero into an odd number.
-if(evenNumberNowZeroVertex.size() % 2 == 1)
-{
-	evenNumberNowZeroVertex.add(evenNumbers.get(0));
-	evenNumbers.remove(0);
-}
-
-
-ArrayList<Vertex> zeroReadyToPair = new ArrayList<Vertex>();
-while(evenNumberNowZeroVertex.isEmpty() == false)
-{
-	int savedIndex 	 = -1;
-	int combinedDistance = Integer.MAX_VALUE;
-
-	for(int i = 1; i < evenNumberNowZeroVertex.size(); i++)
-	{
-		if(distances[evenNumberNowZeroVertex.get(0).getID()][evenNumberNowZeroVertex.get(i).getID()] < combinedDistance)
-		{
-			combinedDistance = distances[evenNumberNowZeroVertex.get(0).getID()][evenNumberNowZeroVertex.get(i).getID()];
-			savedIndex = i;
-		}
-	}
-
-	
-	Edge connectMeToID0 =
-new Edge(evenNumberNowZeroVertex.get(0).getID(), evenNumberNowZeroVertex.get(savedIndex).getID(), distances[evenNumberNowZeroVertex.get(0).getID()][evenNumberNowZeroVertex.get(savedIndex).getID()]);
-	Edge connectMeToIDSaved  =
-new Edge(evenNumberNowZeroVertex.get(savedIndex).getID(), evenNumberNowZeroVertex.get(0).getID(), distances[evenNumberNowZeroVertex.get(0).getID()][evenNumberNowZeroVertex.get(savedIndex).getID()]);
-	
-	
-	evenNumberNowZeroVertex.get(0).connectedVertices.add(connectMeToID0);
-	evenNumberNowZeroVertex.get(savedIndex).connectedVertices.add(connectMeToIDSaved);
-	
-	
-	zeroReadyToPair.add(evenNumberNowZeroVertex.get(0));
-	zeroReadyToPair.add(evenNumberNowZeroVertex.get(savedIndex));
-	
-	
-	
-	evenNumberNowZeroVertex.remove(savedIndex);
-	evenNumberNowZeroVertex.remove(0);
-
-}	
-
-
-ArrayList<Integer> EdgeCaseNumbers = new ArrayList<Integer>(); // for while loop
-ArrayList<Vertex>  ZeroReadyToAdd  = new ArrayList<Vertex>();
-
-
-while(zeroReadyToPair.isEmpty() == false)
-{
-    int edgeCase = -1;
-	//This is ONLY if the even numbers now 0 was odd and is to ensure a connection
-	//to a "fake" zero node isn't made to a vertex twice.
-
-	if(zeroReadyToPair.get(0).connectedVertices.size() > 1)
-	{
-		for(int i = 0; i < zeroReadyToPair.get(0).connectedVertices.size(); i++)
-		{
-			EdgeCaseNumbers.add(zeroReadyToPair.get(0).connectedVertices.get(i).child);
-			edgeCase = zeroReadyToPair.get(0).getID();
-		}
-	}
-	
-int	vertexIDOne = zeroReadyToPair.get(0).getID();
-int	vertexIDTwo = zeroReadyToPair.get(1).getID();
-	
-	int combinedDistances = Integer.MAX_VALUE;
-
-	int indexToConnect    = -1;
-	
-	for(int i = 0; i < evenNumbers.size(); i++)
-	{
-		if(zeroReadyToPair.get(0).getID() != edgeCase)
-		{
-			int distanceOne 			= distances[vertexIDOne][evenNumbers.get(i).getID()];
-			int distanceTwo 			= distances[vertexIDTwo][evenNumbers.get(i).getID()];
-			int checkCombinedDistances  = distanceOne + distanceTwo;
-			
-			if(checkCombinedDistances < combinedDistances)
-			{
-				combinedDistances = checkCombinedDistances;
-				indexToConnect    = i;
-			}		
-		}
-		else
-		{
-			if(!EdgeCaseNumbers.contains(evenNumbers.get(i).getID()))
-				{
-				int distanceOne 			= distances[vertexIDOne][evenNumbers.get(i).getID()];
-				int distanceTwo 			= distances[vertexIDTwo][evenNumbers.get(i).getID()];
-				int checkCombinedDistances  = distanceOne + distanceTwo;
-				
-				if(checkCombinedDistances < combinedDistances)
-				{
-					combinedDistances = checkCombinedDistances;
-					indexToConnect    = i;
-				}		
-				}
-		}
-	}
-	
-	Edge vertexIDOneConnector 			= new Edge(vertexIDOne, evenNumbers.get(indexToConnect).getID(), distances[vertexIDOne][indexToConnect]);
-	Edge vertexEvenIDOneConnector 		= new Edge(evenNumbers.get(indexToConnect).getID(), vertexIDOne, distances[vertexIDOne][indexToConnect]);
-	Edge vertexIDTwoConnector			= new Edge(vertexIDTwo, evenNumbers.get(indexToConnect).getID(), distances[vertexIDTwo][indexToConnect]);		
-	Edge vertexEvenIDTwoConnector       = new Edge(evenNumbers.get(indexToConnect).getID(),vertexIDTwo, distances[vertexIDTwo][indexToConnect]);
-	
-	zeroReadyToPair.get(0).connectedVertices.add(vertexIDOneConnector);
-	zeroReadyToPair.get(1).connectedVertices.add(vertexIDTwoConnector);
-	
-	evenNumbers.get(indexToConnect).connectedVertices.add(vertexEvenIDOneConnector);
-	evenNumbers.get(indexToConnect).connectedVertices.add(vertexEvenIDTwoConnector);
-
-	ZeroReadyToAdd.add(zeroReadyToPair.get(0));
-	ZeroReadyToAdd.add(zeroReadyToPair.get(1));
-	
-	zeroReadyToPair.remove(1);
-	zeroReadyToPair.remove(0);	
-	
-}
-	
-while(ZeroReadyToAdd.isEmpty() == false)
-{
-	evenNumbers.add(ZeroReadyToAdd.get(0));
-	ZeroReadyToAdd.remove(0);
-}
-
-/*Debugging script
-for(int i = 0; i < evenNumbers.size(); i ++)
-{
-	if(evenNumbers.get(i).connectedVertices.size() % 2 == 1)
-	{
-		System.out.println("ERROR: even numbers vertex contains an odd number");
-		
-	}
-}
-*/
-while(evenNumberOddVertex.isEmpty() == false)
-{
-	
-	
-	ArrayList<Integer> firstNumberConnections = new ArrayList<Integer>();
-	for(int i = 0; i < evenNumberOddVertex.get(0).connectedVertices.size(); i++)
-	{
-		firstNumberConnections.add(evenNumberOddVertex.get(0).connectedVertices.get(i).child);
-	}
-	
-	int  minDistance = Integer.MAX_VALUE;
-	int  evenIndex   = -1;
-	int  jIndex      = -1;
-	
-	
-	ArrayList<Integer> secondNumberConnections = new ArrayList<Integer>();
-	
-	
-	for(int i = 1; i < evenNumberOddVertex.size(); i++)
-	{
-		for(int j = 0; j < evenNumberOddVertex.get(i).connectedVertices.size(); j++ )
-		{
-			secondNumberConnections.add(evenNumberOddVertex.get(i).connectedVertices.get(j).child);
-		}
-		for(int k = 0; k < evenNumbers.size(); k++)
-		{
-			if(!(secondNumberConnections.contains(evenNumbers.get(i).getID()) || firstNumberConnections.contains(evenNumbers.get(i).getID())))
-				{
-				if(distances[evenNumberOddVertex.get(0).getID()][evenNumberOddVertex.get(i).getID()] < minDistance )
-					{
-						jIndex 	  = i;
-						evenIndex = k;		
-						minDistance = distances[evenNumberOddVertex.get(0).getID()][evenNumberOddVertex.get(i).getID()];
-					}
-				}
-		}
-
-	}
-	Edge vertexIDOneConnector 			= new Edge(evenNumberOddVertex.get(0).getID(), evenNumbers.get(evenIndex).getID(), distances[evenNumberOddVertex.get(0).getID()][evenNumbers.get(evenIndex).getID()]);
-	Edge vertexIDOneConnectorNumberTwo	= new Edge(evenNumbers.get(evenIndex).getID(), evenNumberOddVertex.get(0).getID(), distances[evenNumberOddVertex.get(0).getID()][evenNumbers.get(evenIndex).getID()]);
-
-	Edge vertexIDTwoConnector			= new Edge(evenNumberOddVertex.get(jIndex).getID(), evenNumbers.get(evenIndex).getID(), distances[evenNumberOddVertex.get(jIndex).getID()][ evenNumbers.get(evenIndex).getID()]);		
-	Edge vertexIDTwoConnectorNumber2	= new Edge(evenNumbers.get(evenIndex).getID(), evenNumberOddVertex.get(jIndex).getID(), distances[evenNumberOddVertex.get(jIndex).getID()][ evenNumbers.get(evenIndex).getID()]);		
-
-	
-	
-	evenNumberOddVertex.get(0).connectedVertices.add(vertexIDOneConnector);
-	evenNumberOddVertex.get(jIndex).connectedVertices.add(vertexIDTwoConnector);
-	
-	evenNumbers.get(evenIndex).connectedVertices.add(vertexIDOneConnectorNumberTwo);
-	evenNumbers.get(evenIndex).connectedVertices.add(vertexIDTwoConnectorNumber2);
-
-	evenNumbers.add(evenNumberOddVertex.get(0));
-	evenNumbers.add(evenNumberOddVertex.get(jIndex));
-	
-	evenNumberOddVertex.remove(jIndex);
-	evenNumberOddVertex.remove(0);	
-}
-
-/*Debugging Script
-for(int i = 0; i < evenNumbers.size(); i++)
-{
-	ArrayList<Integer> children = new ArrayList<Integer>();
-	for(int j = 0; j < evenNumbers.get(i).connectedVertices.size(); j++)
-	{
-		if(children.contains(evenNumbers.get(i).connectedVertices.get(j).child))
-		{
-			System.out.println("Duplicate value found.");
-		}
-		else
-		{
-			children.add(evenNumbers.get(i).connectedVertices.get(j).child);
-		}
-		
-	}
-}
-*/
-
-
-
-
-
-
-
 
 return evenNumbers;
 }
@@ -628,16 +219,33 @@ static void updateEdges(ArrayList<Vertex> updateEdges)
 		}
 	}
 }
-static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances)
+static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances, String p)
 {
-	int totalDistance = 0;
-	for(int i = 0; i < TSP.size()-1; i++)
-	{
-		System.out.println(TSP.get(i).getID());
-		totalDistance+= distances[TSP.get(i).getID()][TSP.get(i+1).getID()];
-	}
+	try {
+		PrintWriter writer = new PrintWriter((p + ".tour"));
+		int totalDistance = 0;
+		for(int i = 0; i < TSP.size()-1; i++)
+		{
+			System.out.println(TSP.get(i).getID());
+			totalDistance+= distances[TSP.get(i).getID()][TSP.get(i+1).getID()];
+		}
+
+		totalDistance+= distances[TSP.get(0).getID()][TSP.get(TSP.size()-1).getID()];
+		System.out.println("Total distance covered is: " + totalDistance + "\n");
+		writer.write(totalDistance);
+		
+		for(int i = 0; i < TSP.size(); i++)
+		{
+			writer.write(TSP.get(i).getID() + "\n");
+		}
+		writer.close();
+	} 
 	
-	System.out.println("Total distance covered is: " + totalDistance);
+	
+	catch (FileNotFoundException e) {
+		e.printStackTrace();
+	}
+
 }
 }
 

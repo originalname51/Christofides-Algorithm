@@ -20,13 +20,14 @@ public class Hierholzer
 			LinkedList<Vertex> currentTour = new LinkedList<Vertex>(vertexGraph);
 			firstPath = new LinkedList<Vertex>();
 
-			while (currentTour.get(0).connectedVertices.size() != 0) {
+			while (currentTour.get(0).connectedVertices.size() != 0) 
+			{
 				firstPath = returnAPath(currentTour.get(0));
 				firstPath = runHelper(firstPath);
 			}
 			
 			
-/*Debugging Script
+/*//Debugging Script
 			for(int i = 0; i < currentTour.size(); i++)
 			{
 				boolean foundit = false;
@@ -42,8 +43,8 @@ public class Hierholzer
 					System.out.println("ID : " + currentTour.get(i).getID() + " not in tour");
 				}
 			}
-			
-*/
+	*/
+
 	return firstPath;
 }	
 LinkedList<Vertex>   runHelper(LinkedList<Vertex> firstPath)

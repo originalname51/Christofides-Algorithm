@@ -50,7 +50,7 @@ ArrayList<Vertex>  Run()
 //sorts and checks each edge to make sure it is the smallest.
 //Sort is run BEFORE the new weights are assigned to insure that the new graph will be connected.
 //This is mainly because the initial initialization happens before the while loop.
-	while(unsortedList.isEmpty() == false)
+	while(!unsortedList.isEmpty())
 	{	
 	    unsortedList.get(0).connectedVertices.add(unsortedList.get(0).edge); 
    

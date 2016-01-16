@@ -6,7 +6,6 @@ public class Edge {
 	int weight = -1;
 	Vertex Owner;
 	Vertex Child;
-	boolean usedEdge;
 	
 public Edge(int p, int c, int w)
 {
@@ -15,7 +14,6 @@ public Edge(int p, int c, int w)
 	weight = w;
 	Owner = null;
 	Child = null;
-	usedEdge = false;
 }
 
 public Edge(int p, int c, int w, Vertex cv, Vertex ov)
@@ -25,7 +23,6 @@ public Edge(int p, int c, int w, Vertex cv, Vertex ov)
 	weight = w;
 	Owner = ov;
 	Child = cv;
-	usedEdge = false;
 }
 
 public void setParentChild(Vertex p, Vertex c)

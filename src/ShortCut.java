@@ -14,15 +14,15 @@ public class ShortCut {
 	
 ArrayList<Vertex> run()
 {
-	for(int i = 0; i < tour.size(); i++)
+	ArrayList<Vertex> tor = new ArrayList<Vertex>(tour);
+	for(int i = 0; i < tor.size(); i++)
 	{
 		if(!result.contains(tour.get(i)))
 		{
 			result.add(tour.get(i));
 		}
 	}
-	result.add(tour.get(0));
-	result.add(tour.get(0));
+	
 	return result;
 }
 }
