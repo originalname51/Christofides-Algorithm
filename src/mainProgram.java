@@ -98,7 +98,6 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 			}
 		}
 		
-<<<<<<< HEAD:src/mainProgram.java
 		Edge fromZeroToPairEdge = new Edge(oddNumbers.get(0).getID(),oddNumbers.get(indexToRemove).getID(),distance, oddNumbers.get(0), oddNumbers.get(indexToRemove));
 		Edge fromPairEdgeToZero = new Edge(oddNumbers.get(indexToRemove).getID(),oddNumbers.get(0).getID(),distance, oddNumbers.get(indexToRemove),oddNumbers.get(0));
 		oddNumbers.get(0).connectedVertices.add(fromZeroToPairEdge);
@@ -110,29 +109,6 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 	}
 	
 return MinimumSpanningTree;
-=======
-		Edge fromZeroToPairEdge = new Edge(oddNumbersUnpaired.get(0).getID(),oddNumbersUnpaired.get(indexToRemove).getID(),distance, oddNumbersUnpaired.get(0), oddNumbersUnpaired.get(indexToRemove));
-		Edge fromPairEdgeToZero = new Edge(oddNumbersUnpaired.get(indexToRemove).getID(),oddNumbersUnpaired.get(0).getID(),distance, oddNumbersUnpaired.get(indexToRemove),oddNumbersUnpaired.get(0));
-		
-		oddNumbersUnpaired.get(0).connectedVertices.add(fromZeroToPairEdge);
-		oddNumbersUnpaired.get(indexToRemove).connectedVertices.add(fromPairEdgeToZero);
-		
-		oddNumbersPaired.add(oddNumbersUnpaired.get(0));
-		oddNumbersPaired.add(oddNumbersUnpaired.get(indexToRemove));
-		
-		oddNumbersUnpaired.remove(indexToRemove);
-		oddNumbersUnpaired.remove(0);
-	}
-	
-//combine the odd vertex's to even vertexes.	
-	while(oddNumbersPaired.isEmpty() == false)
-	{
-		evenNumbers.add(oddNumbersPaired.get(0));
-		oddNumbersPaired.remove(0);
-	}
-
-return evenNumbers;
->>>>>>> origin/master:src/mainProgram.java
 }
 
 static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances, String p)
