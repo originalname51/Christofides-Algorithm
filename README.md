@@ -6,6 +6,7 @@ Program assumes input document contains a text document with 3 lines representin
 Program will run program and output TSP path to screen as well as output argument appeneded with ".tour" containing full path and total cost of 
 tour.
 
+Change the variable "howManyMinutesToRunTSP" to how many minutes you would like to run the TwoOpt program. It is set to 0.25 as default (15 seconds).
 
 To run from eclipse go to run configuations. Click on tab "Arguments" and change Program arguments to whatever txt file and change the working directory(click "Other") to where your text file is located. 
 
