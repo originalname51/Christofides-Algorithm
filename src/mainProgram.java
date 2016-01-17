@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-public class project4 {
+public class mainProgram {
 
 	public static void main(String[] args) throws IOException 
 	{
@@ -70,39 +70,28 @@ static ArrayList<Vertex> parseGraph(String in) throws IOException
 	/*
 	This splits even and odds from each other and then creates a "perfect matching" (it doesn't actually, 
 	but attempts something close to), and then reconnects the graph. Please note this creates a Eulerian Multigraph
-	which means edges can be connected to each other twice. A-B A-B can exist.
+	which means edges can be connected to each other twice. 2 edges "A-B" "A-B" can exist from the same Vertex.
 	 * */
 static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningTree, int [][] distances)
 {
-	ArrayList<Vertex> oddNumbersUnpaired           = new ArrayList<Vertex>();
-	ArrayList<Vertex> oddNumbersPaired             = new ArrayList<Vertex>();
-	ArrayList<Vertex> evenNumbers                  = new ArrayList<Vertex>();
-	
-	//This will separate the MinimumSPanningTree into an odd half and an even half of vertices.
-	
+	ArrayList<Vertex> oddNumbers           = new ArrayList<Vertex>();		
 	for(int i = 0; i < MinimumSpanningTree.size(); i++)
 	{
 		if(MinimumSpanningTree.get(i).connectedVertices.size() % 2 == 1)
 		{
-			oddNumbersUnpaired.add(MinimumSpanningTree.get(i));
-			MinimumSpanningTree.get(i).evenEdge = false;
-		}
-		else
-		{
-			evenNumbers.add(MinimumSpanningTree.get(i));
-			MinimumSpanningTree.get(i).evenEdge = true;
+			oddNumbers.add(MinimumSpanningTree.get(i));
 		}
 	}
 
 //This will create edges between two odd vertices.
-	while(oddNumbersUnpaired.isEmpty() == false)
+	while(oddNumbers.isEmpty() == false)
 	{
 		int     distance      = Integer.MAX_VALUE;
 		int     indexToRemove = -1;
 		
-		for(int i = 1; i < oddNumbersUnpaired.size(); i++)
+		for(int i = 1; i < oddNumbers.size(); i++)
 		{
-			int checkDistance = distances[oddNumbersUnpaired.get(0).getID()][oddNumbersUnpaired.get(i).getID()];
+			int checkDistance = distances[oddNumbers.get(0).getID()][oddNumbers.get(i).getID()];
 			if(checkDistance < distance)
 			{
 				distance = checkDistance;
@@ -110,30 +99,17 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 			}
 		}
 		
-	
-	
-		Edge fromZeroToPairEdge = new Edge(oddNumbersUnpaired.get(0).getID(),oddNumbersUnpaired.get(indexToRemove).getID(),distance, oddNumbersUnpaired.get(0), oddNumbersUnpaired.get(indexToRemove));
-		Edge fromPairEdgeToZero = new Edge(oddNumbersUnpaired.get(indexToRemove).getID(),oddNumbersUnpaired.get(0).getID(),distance, oddNumbersUnpaired.get(indexToRemove),oddNumbersUnpaired.get(0));
-		
-		oddNumbersUnpaired.get(0).connectedVertices.add(fromZeroToPairEdge);
-		oddNumbersUnpaired.get(indexToRemove).connectedVertices.add(fromPairEdgeToZero);
-		
-		oddNumbersPaired.add(oddNumbersUnpaired.get(0));
-		oddNumbersPaired.add(oddNumbersUnpaired.get(indexToRemove));
-		
-		oddNumbersUnpaired.remove(indexToRemove);
-		oddNumbersUnpaired.remove(0);
+		Edge fromZeroToPairEdge = new Edge(oddNumbers.get(0).getID(),oddNumbers.get(indexToRemove).getID(),distance, oddNumbers.get(0), oddNumbers.get(indexToRemove));
+		Edge fromPairEdgeToZero = new Edge(oddNumbers.get(indexToRemove).getID(),oddNumbers.get(0).getID(),distance, oddNumbers.get(indexToRemove),oddNumbers.get(0));
+		oddNumbers.get(0).connectedVertices.add(fromZeroToPairEdge);
+		oddNumbers.get(indexToRemove).connectedVertices.add(fromPairEdgeToZero);
+
+		oddNumbers.remove(indexToRemove);
+		oddNumbers.remove(0);
 		
 	}
 	
-//combine the odd vertex's to even vertexes.	
-while(oddNumbersPaired.isEmpty() == false)
-{
-	evenNumbers.add(oddNumbersPaired.get(0));
-	oddNumbersPaired.remove(0);
-}
-
-return evenNumbers;
+return MinimumSpanningTree;
 }
 
 static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances, String p)

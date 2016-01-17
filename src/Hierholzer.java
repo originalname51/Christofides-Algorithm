@@ -54,7 +54,7 @@ LinkedList<Vertex>   returnAPath(Vertex pathStart)
 {
 	LinkedList<Vertex> returnValue = new LinkedList<Vertex>();
 	
-	Vertex pathFinish = pathStart.connectedVertices.get(0).Child;
+	Vertex pathFinish = null;
 	Vertex firstNode = pathStart;
 	while(firstNode != pathFinish)
 	{
