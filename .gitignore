@@ -1,0 +1,4 @@
+*.tour
+test-input-1.txt.tour
+*.py
+__pycache__/TSPAllVisited.cpython-35.pyc
