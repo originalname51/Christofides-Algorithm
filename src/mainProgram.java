@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-public class project4 {
+public class mainProgram {
 
 	public static void main(String[] args) throws IOException 
 	{
