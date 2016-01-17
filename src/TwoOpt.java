@@ -57,7 +57,8 @@ ArrayList<Vertex> runTwoOpt(boolean b)
 					
 					break;
 				}
-			}
+			} //end inner for loop
+			
 			elapsedTime = (new Date()).getTime() - startTime;
 			if(elapsedTime > howLongToRun * 60 * 1000)
 			{
