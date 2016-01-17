@@ -5,12 +5,12 @@ import java.util.Comparator;
 public class PrimsAlgorithm {
 	
 	int [] [] distances;
-	Vertex [] graph;
+	ArrayList<Vertex> unsortedList;
 	
-	PrimsAlgorithm(Vertex [] g, int [][] distance)
+	PrimsAlgorithm(ArrayList<Vertex> g, int [][] distance)
 	{
 		distances = distance;
-		graph = g;
+		unsortedList = g;
 	}
 	
 /*
@@ -22,15 +22,7 @@ find the minimum-weight edge, and transfer it to the tree.
 ArrayList<Vertex>  Run()
 {
 	ArrayList<Vertex> sortedList     = new ArrayList<Vertex>();
-	ArrayList<Vertex> unsortedList   = new ArrayList<Vertex>();
 	Comparator<Vertex> compareMethod = new VertexComparator();
-	
-//This adds a little bit of functionality to the array of Vertices.	
-	for(int i = 0; i < graph.length; i++)
-	{
-		unsortedList.add(graph[i]);
-	}
-
 	
 //This will initialize all vertex shortest edge to the initial base vertex. This is important because it creates a new edge for all
 // vertices. It is required as it seeds the next part of the algorithm (the while loop)
@@ -39,7 +31,7 @@ ArrayList<Vertex>  Run()
 	for(int i = 0; i < unsortedList.size(); i++)
 	{	
 		unsortedList.get(i).edge = 
-		new Edge(unsortedList.get(i).getID(), unsortedList.get(0).getID(), distances[unsortedList.get(i).getID()][unsortedList.get(0).getID()]);
+		new Edge(unsortedList.get(i).getID(), unsortedList.get(0).getID(), distances[unsortedList.get(i).getID()][unsortedList.get(0).getID()], unsortedList.get(i), unsortedList.get(0));
 		//Edge constructor is parentID, ChildID, Weight
 	}
 
@@ -63,7 +55,7 @@ ArrayList<Vertex>  Run()
 	    	{
 	    		if(parentEdge.child == sortedList.get(i).getID())
 	    		{
-	    			Edge childEdge = new Edge(parentEdge.child, parentEdge.parent, parentEdge.weight);
+	    			Edge childEdge = new Edge(parentEdge.child, parentEdge.parent, parentEdge.weight, parentEdge.Child, parentEdge.Owner);
 	    			sortedList.get(i).connectedVertices.add(childEdge);
 	    		}
 	    	}
@@ -71,12 +63,15 @@ ArrayList<Vertex>  Run()
 	    else //special case for root node
 	    {
 	    	unsortedList.get(0).connectedVertices.remove(0);
+	    	
 	    	Edge updateEdge = unsortedList.get(1).edge;
 	    	unsortedList.get(0).edge.parent = unsortedList.get(0).getID();
 	    	unsortedList.get(0).edge.child = updateEdge.parent;
+	    	unsortedList.get(0).edge.Owner = unsortedList.get(0);
+	    	unsortedList.get(0).edge.Child = unsortedList.get(1);	    	
 	    	unsortedList.get(0).edge.weight = updateEdge.weight;
 	    	unsortedList.get(0).connectedVertices.add(unsortedList.get(0).edge);
-	    	Edge childEdge = new Edge(unsortedList.get(0).edge.child, unsortedList.get(0).edge.parent, unsortedList.get(0).edge.weight);
+	    	Edge childEdge = new Edge(unsortedList.get(0).edge.child, unsortedList.get(0).edge.parent, unsortedList.get(0).edge.weight, unsortedList.get(0).edge.Child, unsortedList.get(0).edge.Owner);
 	    	unsortedList.get(1).connectedVertices.add(childEdge);
 	    	
 	    }
@@ -92,6 +87,7 @@ ArrayList<Vertex>  Run()
 			 if(checkNewWeight < unsortedList.get(i).edge.weight)
 			 {
 				 unsortedList.get(i).edge.child = unsortedList.get(0).getID();
+				 unsortedList.get(i).edge.Child = unsortedList.get(0);
 				 unsortedList.get(i).edge.weight = checkNewWeight;
 			 }
 		}		

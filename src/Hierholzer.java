@@ -26,30 +26,10 @@ public class Hierholzer
 				firstPath = runHelper(firstPath);
 			}
 			
-			
-/*//Debugging Script
-			for(int i = 0; i < currentTour.size(); i++)
-			{
-				boolean foundit = false;
-				for(int j = 0; j < firstPath.size(); j++)		
-				{
-					if(currentTour.get(i).getID() == firstPath.get(j).getID())
-					{
-						foundit = true;
-					}
-				}
-				if(foundit == false)
-				{
-					System.out.println("ID : " + currentTour.get(i).getID() + " not in tour");
-				}
-			}
-	*/
-
 	return firstPath;
 }	
 LinkedList<Vertex>   runHelper(LinkedList<Vertex> firstPath)
 {
-	
 		for(int i = 0; i < firstPath.size(); i++)
 		{
 			if(firstPath.get(i).connectedVertices.size() > 0)
@@ -65,9 +45,7 @@ LinkedList<Vertex>   runHelper(LinkedList<Vertex> firstPath)
 				}
 			}
 		}
-
-	
-	
+		
 	return firstPath;
 }
 	
@@ -95,7 +73,7 @@ LinkedList<Vertex>   returnAPath(Vertex pathStart)
 		pathStart = pathFinish;
 	}
 	
-	returnValue.add(pathFinish);
+	returnValue.add(pathFinish); //This needs to be added to "complete" the loop.
 	return returnValue;
 }
 	

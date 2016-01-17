@@ -8,9 +8,7 @@ public class Vertex
 	   private int y_var;	
 	   public ArrayList<Edge> connectedVertices;
 	   public   Edge 	   edge; //used for prims algorithm
-	   
-	   int     parentID;
-	   int     weightCost;
+
 	   boolean evenEdge;
 	   
 	   public Vertex(int id, int x_var, int y_var)
@@ -19,11 +17,7 @@ public class Vertex
 		   this.x_var = x_var;
 		   this.y_var = y_var;
 		   this.connectedVertices = new ArrayList<Edge>();
-		   
-		   this.parentID   = -1;
-		   this.weightCost = -1;
-		   this.edge       = null;
-		   
+		   this.edge       = null;  
 	   }
 	   
 	   int getID()

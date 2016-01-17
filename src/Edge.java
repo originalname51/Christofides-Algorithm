@@ -16,7 +16,7 @@ public Edge(int p, int c, int w)
 	Child = null;
 }
 
-public Edge(int p, int c, int w, Vertex cv, Vertex ov)
+public Edge(int p, int c, int w, Vertex ov, Vertex cv)
 {
 	parent = p;
 	child  = c;

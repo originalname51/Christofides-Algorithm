@@ -19,7 +19,8 @@ public class VertexComparator implements Comparator<Vertex>{
     	{
     		return 0;
     	}
-    	else{
+    	else
+    	{
     	return 0;
     	}
     }
