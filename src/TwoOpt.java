@@ -10,7 +10,7 @@ public class TwoOpt {
 	{
 		distances    = d;
 		graph        = g;
-		timeToRun = t;
+		timeToRun    = t;
 	}
 	
 	
@@ -18,7 +18,7 @@ ArrayList<Vertex> runTwoOpt(boolean b)
 {
 	
 	long startTime = System.currentTimeMillis();
-	long elapsedTime = 0L;
+	long elapsedTime = 0;
 	double	howLongToRun = timeToRun/2.0;
 
 	do
@@ -50,7 +50,7 @@ ArrayList<Vertex> runTwoOpt(boolean b)
 						break;
 					}
 				}
-				//Check time to make sure there is enough.
+				//I am checking time repeatedly to ensure I do not go over alloted time.
 				elapsedTime = (new Date()).getTime() - startTime;
 				if(elapsedTime > howLongToRun * 60 * 1000)
 				{
@@ -65,7 +65,7 @@ ArrayList<Vertex> runTwoOpt(boolean b)
 			}
 		}
 		
-	}while(elapsedTime < howLongToRun *60*1000); //two minutes of searching for better times.
+	}while(elapsedTime < howLongToRun *60*1000); 
 	
 	return graph;
 }
