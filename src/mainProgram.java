@@ -28,7 +28,6 @@ public class mainProgram {
 		ArrayList<Vertex> TSP = answer.run();
 			
 		FinalAnswer(TSP, distances, args[0]);
-	
 	}
 	
 static ArrayList<Vertex> parseGraph(String in) throws IOException
@@ -110,8 +109,6 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 			}
 		}
 		
-	
-	
 		Edge fromZeroToPairEdge = new Edge(oddNumbersUnpaired.get(0).getID(),oddNumbersUnpaired.get(indexToRemove).getID(),distance, oddNumbersUnpaired.get(0), oddNumbersUnpaired.get(indexToRemove));
 		Edge fromPairEdgeToZero = new Edge(oddNumbersUnpaired.get(indexToRemove).getID(),oddNumbersUnpaired.get(0).getID(),distance, oddNumbersUnpaired.get(indexToRemove),oddNumbersUnpaired.get(0));
 		
@@ -123,15 +120,14 @@ static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningT
 		
 		oddNumbersUnpaired.remove(indexToRemove);
 		oddNumbersUnpaired.remove(0);
-		
 	}
 	
 //combine the odd vertex's to even vertexes.	
-while(oddNumbersPaired.isEmpty() == false)
-{
-	evenNumbers.add(oddNumbersPaired.get(0));
-	oddNumbersPaired.remove(0);
-}
+	while(oddNumbersPaired.isEmpty() == false)
+	{
+		evenNumbers.add(oddNumbersPaired.get(0));
+		oddNumbersPaired.remove(0);
+	}
 
 return evenNumbers;
 }
