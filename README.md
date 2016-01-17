@@ -9,4 +9,8 @@ tour.
 
 To run from eclipse go to run configuations. Click on tab "Arguments" and change Program arguments to whatever txt file and change the working directory(click "Other") to where your text file is located. 
 
-To run after compile type java -jar Christofides-Algorithm "insert-name-of-file-without-quotes-here.txt" while in the same folder as your jar file and the text document you are taking data from.
+To run after compile type: 
+
+java -jar Christofides-Algorithm "insert-name-of-file-without-quotes-here.txt" 
+
+While in the same folder as your jar file and the text document you are taking data from.
