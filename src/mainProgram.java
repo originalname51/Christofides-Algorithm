@@ -11,7 +11,9 @@ public class mainProgram {
 
 	public static void main(String[] args) throws IOException 
 	{
+		Benchmark benchmark = new Benchmark();
 		
+		benchmark.startMark();
 		ArrayList<Vertex> theGraph = parseGraph(args[0]);
 		
 		int[][] distances = getDistances(theGraph);
@@ -26,8 +28,16 @@ public class mainProgram {
 		
 		ShortCut answer = new ShortCut(eulerTour);
 		ArrayList<Vertex> TSP = answer.run();
-			
+		
+		double howManyMinutesToRunTSP = 0.25;
+		TwoOpt TwoOpt = new TwoOpt(TSP,distances,howManyMinutesToRunTSP);
+		TSP = TwoOpt.run();
+
 		FinalAnswer(TSP, distances, args[0]);
+		benchmark.endMark();
+		double time = ((benchmark.resultTime()/60.00)/1000.00);
+		System.out.println("Program took: " + time + " minutes");
+		
 	}
 	
 static ArrayList<Vertex> parseGraph(String in) throws IOException
@@ -135,12 +145,13 @@ static void FinalAnswer(ArrayList<Vertex> TSP, int [][] distances, String p)
 		
 		
 		totalDistance+= distances[TSP.get(0).getID()][TSP.get(TSP.size()-1).getID()];
-		System.out.println("Total distance covered is: " + totalDistance + "\n");
-		writer.write(totalDistance);
+		System.out.println("Total distance covered of the " + TSP.size() + " vertices is: " +  totalDistance);
+		
+		writer.println(totalDistance);
 		
 		for(int i = 0; i < TSP.size(); i++)
 		{
-			writer.write(TSP.get(i).getID() + "\n");
+			writer.println(TSP.get(i).getID());
 		}
 		writer.close();
 	} 
