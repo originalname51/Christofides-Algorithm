@@ -1,3 +1,5 @@
+package main.java;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,7 +34,7 @@ ArrayList<Vertex>  Run()
 	{	
 		unsortedList.get(i).edge = 
 		new Edge(unsortedList.get(i).getID(), unsortedList.get(0).getID(), distances[unsortedList.get(i).getID()][unsortedList.get(0).getID()], unsortedList.get(i), unsortedList.get(0));
-		//Edge constructor is parentID, ChildID, Weight
+		//main.java.Edge constructor is parentID, ChildID, Weight
 	}
 
 	Collections.sort(unsortedList, compareMethod);
