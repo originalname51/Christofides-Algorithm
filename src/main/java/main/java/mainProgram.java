@@ -28,10 +28,10 @@ public class mainProgram {
         LinkedList<Vertex> eulerTour =  HierholzerAlgorithm.run(MinimumSpanningTree);
         ArrayList<Vertex> TSP = ShortCut.run(eulerTour);
 
-//        double howManyMinutesToRunTSP = 0.25;
-//        TwoOpt TwoOpt = new TwoOpt(TSP,distances,howManyMinutesToRunTSP);
-//        TSP = TwoOpt.run();
-//
+        double secondsToRunTwoOpt = 15;
+        TwoOpt TwoOpt = new TwoOpt(TSP,distances,secondsToRunTwoOpt);
+        TSP = TwoOpt.run();
+
         ChristofidesTour finalAnswer =  FinalAnswer(TSP, distances, arg);
         benchmark.endMark();
         System.out.println("Program took: " + benchmark.resultTime() + " ms");
@@ -118,27 +118,27 @@ public class mainProgram {
         try {
             PrintWriter writer = new PrintWriter((p + ".tour"));
             int lineFormatting = 0;
-            for (int i = 0; i < TSP.size() - 1; i++) {
-
-                System.out.print(TSP.get(i).getID() + " ");
+            for (Vertex vertex : TSP) {
+                System.out.print(vertex.getID() + " ");
                 if (lineFormatting == 20) {
                     lineFormatting = 0;
                     System.out.println();
                 }
                 lineFormatting++;
-
-                totalDistance += distances[TSP.get(i).getID()][TSP.get(i + 1).getID()];
             }
             System.out.println();
 
+            totalDistance = TSP.stream()
+                    .mapToInt
+                            (vertex -> TSP.indexOf(vertex) == TSP.size()-1 ? 0 : distances[vertex.getID()][TSP.get(TSP.indexOf(vertex)+1).getID()])
+                    .sum();
+            totalDistance += distances[TSP.get(0).getID()][TSP.get(TSP.size() - 1).getID()]; //calculate the last edge from the end to the start, completing the tour.
 
-            totalDistance += distances[TSP.get(0).getID()][TSP.get(TSP.size() - 1).getID()];
             System.out.println("Total distance covered of the " + TSP.size() + " vertices is: " + totalDistance);
-
             writer.println(totalDistance);
-            for (int i = 0; i < TSP.size(); i++) {
-                finalTour.add(TSP.get(i).getID());
-                writer.println(TSP.get(i).getID());
+            for (Vertex vertex : TSP) {
+                finalTour.add(vertex.getID());
+                writer.println(vertex.getID());
             }
             writer.close();
         } catch (FileNotFoundException e) {
