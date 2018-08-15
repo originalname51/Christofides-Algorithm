@@ -4,7 +4,6 @@ import java.util.Comparator;
 
 
 public class VertexComparator implements Comparator<Vertex>{
-	
 
     public int compare(Vertex arg0, Vertex arg1) {
     	

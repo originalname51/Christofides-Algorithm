@@ -1,5 +1,5 @@
 # Christofides-Algorithm
-Christofides algorithm using Prims Algorithm for MST and main.java.Hierholzer Algorithm for Euler Tour. Resulting path optimized with 2-OPT
+Christofides algorithm using Prims Algorithm for MST and main.java.HierholzerAlgorithm Algorithm for Euler Tour. Resulting path optimized with 2-OPT
 
 Program can be run by typing name of input txt file in argument line. 
 Program assumes input document contains a text document with 3 lines representing the ID, X Coordinates and Y Coordinates.

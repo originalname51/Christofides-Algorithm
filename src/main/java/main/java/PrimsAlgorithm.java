@@ -5,14 +5,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class PrimsAlgorithm {
-	
-	int [] [] distances;
-	ArrayList<Vertex> unsortedList;
-	
-	PrimsAlgorithm(ArrayList<Vertex> g, int [][] distance)
+
+	private PrimsAlgorithm()
 	{
-		distances = distance;
-		unsortedList = g;
 	}
 	
 /*
@@ -21,78 +16,76 @@ public class PrimsAlgorithm {
 find the minimum-weight edge, and transfer it to the tree.
 3: Repeat step 2 (until all vertices are in the tree).
 * */	
-ArrayList<Vertex>  Run()
+public static ArrayList<Vertex>  run(ArrayList<Vertex> unsortedList, int[][] distances)
 {
-	ArrayList<Vertex> sortedList     = new ArrayList<Vertex>();
 	Comparator<Vertex> compareMethod = new VertexComparator();
-	
+
 //This will initialize all vertex shortest edge to the initial base vertex. This is important because it creates a new edge for all
 // vertices. It is required as it seeds the next part of the algorithm (the while loop)
 // It satisfies the "Initialize of the tree with a single vertex" part of Prim's Algorithm.
-
-	for(int i = 0; i < unsortedList.size(); i++)
-	{	
-		unsortedList.get(i).edge = 
-		new Edge(unsortedList.get(i).getID(), unsortedList.get(0).getID(), distances[unsortedList.get(i).getID()][unsortedList.get(0).getID()], unsortedList.get(i), unsortedList.get(0));
-		//main.java.Edge constructor is parentID, ChildID, Weight
-	}
-
+	final Vertex baseVertex = unsortedList.get(0);
+	unsortedList
+			.stream()
+			.forEach(vertex -> vertex.edge = new Edge(vertex, baseVertex, distances[vertex.getID()][baseVertex.getID()]));
 	Collections.sort(unsortedList, compareMethod);
-
 
 //This implements prim's algorithm. It "pops" off and adds to the tree the minimum edge and then 
 //sorts and checks each edge to make sure it is the smallest.
 //Sort is run BEFORE the new weights are assigned to insure that the new graph will be connected.
 //This is mainly because the initial initialization happens before the while loop.
+	ArrayList<Vertex> sortedList     = new ArrayList<>();
 	while(!unsortedList.isEmpty())
-	{	
-	    unsortedList.get(0).connectedVertices.add(unsortedList.get(0).edge); 
-   
-	    
-	    //The following just adds a childEdge helping the graph stay connected.
-	    Edge parentEdge = unsortedList.get(0).edge;
-	    if(sortedList.size() > 0)
-	    {	
-	    	for(int i = 0; i < sortedList.size(); i++)
-	    	{
-	    		if(parentEdge.child == sortedList.get(i).getID())
-	    		{
-	    			Edge childEdge = new Edge(parentEdge.child, parentEdge.parent, parentEdge.weight, parentEdge.Child, parentEdge.Owner);
-	    			sortedList.get(i).connectedVertices.add(childEdge);
-	    		}
-	    	}
-	    }
-	    else //special case for root node
+	{
+		Vertex pointConnected = unsortedList.get(0);
+		pointConnected.connectedVertices.add(pointConnected.edge);
+
+		//The following adds a childEdge helping the graph stay connected.
+	    Edge parentEdge = pointConnected.edge;
+
+	    if(sortedList.isEmpty())
 	    {
-	    	unsortedList.get(0).connectedVertices.remove(0);
-	    	
-	    	Edge updateEdge = unsortedList.get(1).edge;
-	    	unsortedList.get(0).edge.parent = unsortedList.get(0).getID();
-	    	unsortedList.get(0).edge.child = updateEdge.parent;
-	    	unsortedList.get(0).edge.Owner = unsortedList.get(0);
-	    	unsortedList.get(0).edge.Child = unsortedList.get(1);	    	
-	    	unsortedList.get(0).edge.weight = updateEdge.weight;
-	    	unsortedList.get(0).connectedVertices.add(unsortedList.get(0).edge);
-	    	Edge childEdge = new Edge(unsortedList.get(0).edge.child, unsortedList.get(0).edge.parent, unsortedList.get(0).edge.weight, unsortedList.get(0).edge.Child, unsortedList.get(0).edge.Owner);
-	    	unsortedList.get(1).connectedVertices.add(childEdge);
-	    	
+			//special case for root node
+			Vertex rootVertex = unsortedList.get(0);
+			rootVertex.connectedVertices.remove(0);
+			Vertex firstVertex = unsortedList.get(1);
+			Edge updateEdge = firstVertex.edge;
+			rootVertex.edge.parent = rootVertex.getID();
+			rootVertex.edge.child = updateEdge.parent;
+			rootVertex.edge.Owner = rootVertex;
+			rootVertex.edge.Child = unsortedList.get(1);
+			rootVertex.edge.weight = updateEdge.weight;
+			rootVertex.connectedVertices.add(rootVertex.edge);
+			Edge childEdge = new Edge(firstVertex, rootVertex, rootVertex.edge.weight);
+			firstVertex.connectedVertices.add(childEdge);
 	    }
-	    
-		sortedList.add(unsortedList.get(0));		
-		unsortedList.remove(0);
+	    else
+	    {
+	    	sortedList.forEach(vertex -> {
+				if(parentEdge.child == vertex.getID()) {
+					Edge childEdge = new Edge(parentEdge.Child, parentEdge.Owner, parentEdge.weight);
+					vertex.connectedVertices.add(childEdge);
+				}
+			});
+	    }
+
+		sortedList.add(pointConnected);
+		unsortedList.remove(pointConnected);
 		Collections.sort(unsortedList, compareMethod); //lowest weight connected to MST comes to the top
 
-		for(int i = 1; i < unsortedList.size(); i++)
-		{
-			 int checkNewWeight = distances[unsortedList.get(i).getID()][unsortedList.get(0).getID()];
-			 
-			 if(checkNewWeight < unsortedList.get(i).edge.weight)
-			 {
-				 unsortedList.get(i).edge.child = unsortedList.get(0).getID();
-				 unsortedList.get(i).edge.Child = unsortedList.get(0);
-				 unsortedList.get(i).edge.weight = checkNewWeight;
-			 }
-		}		
+		if (!unsortedList.isEmpty()) {
+			Vertex basedVertex = unsortedList.get(0);
+			unsortedList.stream()
+					.forEach(vertex -> {
+				if (vertex != basedVertex) {
+					int checkNewWeight = distances[vertex.getID()][basedVertex.getID()];
+					if (checkNewWeight < vertex.edge.weight) {
+						vertex.edge.child = basedVertex.getID();
+						vertex.edge.Child = basedVertex;
+						vertex.edge.weight = checkNewWeight;
+					}
+				}
+			});
+		}
 	}
 	return sortedList;
 }

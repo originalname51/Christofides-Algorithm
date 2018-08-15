@@ -26,6 +26,14 @@ public Edge(int p, int c, int w, Vertex ov, Vertex cv)
 	Child = cv;
 }
 
+public Edge(Vertex parentEdge, Vertex childEdge, int distance) {
+	parent = parentEdge.getID();
+	child = childEdge.getID();
+	weight = distance;
+	Owner = parentEdge;
+	Child = childEdge;
+}
+
 public void setParentChild(Vertex p, Vertex c)
 {
 	 Owner = p;

@@ -5,10 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class mainProgram {
 
@@ -18,32 +16,23 @@ public class mainProgram {
     }
 
     public static ChristofidesTour ChristofidesAlgorithm(String arg) throws IOException {
- //       Benchmark benchmark = new Benchmark();
+        Benchmark benchmark = new Benchmark();
 
- //       benchmark.startMark();
+        benchmark.startMark();
         ArrayList<Vertex> theGraph = parseGraph(arg);
-
         int[][] distances = getDistances(theGraph);
-
-        PrimsAlgorithm prim = new PrimsAlgorithm(theGraph, distances);
-        ArrayList<Vertex> MinimumSpanningTree = prim.Run();
-
-        ArrayList<Vertex> unitedList = min_weight_and_unite(MinimumSpanningTree, distances);
-
-        Hierholzer Hierholzer = new Hierholzer(unitedList, distances);
-        LinkedList<Vertex> eulerTour = Hierholzer.run();
-
-        ShortCut answer = new ShortCut(eulerTour);
-        ArrayList<Vertex> TSP = answer.run();
+        ArrayList<Vertex> MinimumSpanningTree = PrimsAlgorithm.run(theGraph, distances);
+        createEvenlyVertexedEularianMultiGraphFromMST(MinimumSpanningTree, distances);
+        LinkedList<Vertex> eulerTour =  HierholzerAlgorithm.run(MinimumSpanningTree);
+        ArrayList<Vertex> TSP = ShortCut.run(eulerTour);
 
 //        double howManyMinutesToRunTSP = 0.25;
 //        TwoOpt TwoOpt = new TwoOpt(TSP,distances,howManyMinutesToRunTSP);
 //        TSP = TwoOpt.run();
 //
         ChristofidesTour finalAnswer =  FinalAnswer(TSP, distances, arg);
- //       benchmark.endMark();
-   //     double time = ((benchmark.resultTime() / 60.00) / 1000.00);
-   //     System.out.println("Program took: " + time + " minutes");
+        benchmark.endMark();
+        System.out.println("Program took: " + benchmark.resultTime() + " ms");
         return  finalAnswer;
     }
 
@@ -86,38 +75,37 @@ public class mainProgram {
     but attempts something close to), and then reconnects the graph. Please note this creates a Eulerian Multigraph
     which means edges can be connected to each other twice. 2 edges "A-B" "A-B" can exist from the same main.java.Vertex.
      * */
-    static ArrayList<Vertex> min_weight_and_unite(ArrayList<Vertex> MinimumSpanningTree, int[][] distances) {
-        ArrayList<Vertex> oddNumbers = new ArrayList<Vertex>();
-        for (int i = 0; i < MinimumSpanningTree.size(); i++) {
-            if (MinimumSpanningTree.get(i).connectedVertices.size() % 2 == 1) {
-                oddNumbers.add(MinimumSpanningTree.get(i));
-            }
-        }
+    static ArrayList<Vertex> createEvenlyVertexedEularianMultiGraphFromMST(ArrayList<Vertex> minimumSpanningTree, int[][] distances) {
 
-//This will create edges between two odd vertices.
+        ArrayList<Vertex> oddNumbers = minimumSpanningTree
+                .stream()
+                .filter(vertex -> vertex.connectedVertices.size() % 2 == 1)
+                .collect(Collectors.toCollection(ArrayList::new));
+
         while (oddNumbers.isEmpty() == false) {
             int distance = Integer.MAX_VALUE;
-            int indexToRemove = -1;
+            final Vertex parent = oddNumbers.get(0);
+            oddNumbers.remove(parent);
+            int minDistance = oddNumbers
+                    .stream()
+                    .mapToInt(vertex -> distances[parent.getID()][vertex.getID()])
+                    .min()
+                    .getAsInt();
+            Vertex child = oddNumbers
+                    .stream()
+                    .filter(vertex -> distances[parent.getID()][vertex.getID()] == minDistance)
+                    .findFirst()
+                    .get();
 
-            for (int i = 1; i < oddNumbers.size(); i++) {
-                int checkDistance = distances[oddNumbers.get(0).getID()][oddNumbers.get(i).getID()];
-                if (checkDistance < distance) {
-                    distance = checkDistance;
-                    indexToRemove = i;
-                }
-            }
-
-            Edge fromZeroToPairEdge = new Edge(oddNumbers.get(0).getID(), oddNumbers.get(indexToRemove).getID(), distance, oddNumbers.get(0), oddNumbers.get(indexToRemove));
-            Edge fromPairEdgeToZero = new Edge(oddNumbers.get(indexToRemove).getID(), oddNumbers.get(0).getID(), distance, oddNumbers.get(indexToRemove), oddNumbers.get(0));
-            oddNumbers.get(0).connectedVertices.add(fromZeroToPairEdge);
-            oddNumbers.get(indexToRemove).connectedVertices.add(fromPairEdgeToZero);
-
-            oddNumbers.remove(indexToRemove);
-            oddNumbers.remove(0);
-
+            Edge fromParentToChildEdge = new Edge(parent, child, distance);
+            Edge fromChildToParentEdge = new Edge(child, parent, distance);
+            parent.connectedVertices.add(fromParentToChildEdge);
+            child.connectedVertices.add(fromChildToParentEdge);
+            oddNumbers.remove(parent);
+            oddNumbers.remove(child);
         }
 
-        return MinimumSpanningTree;
+        return minimumSpanningTree;
     }
 
     static ChristofidesTour FinalAnswer(ArrayList<Vertex> TSP, int[][] distances, String p) {
