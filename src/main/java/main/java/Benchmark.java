@@ -1,7 +1,12 @@
+package main.java;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 public class Benchmark
 {
-    private long start = 0;
-    private long end = 0;
+    private LocalDateTime start;
+    private LocalDateTime end;
     private long time = 0;
     private boolean startCheck = false;
     private boolean endCheck = false;
@@ -14,28 +19,27 @@ public Benchmark()
     void startMark()
     {
         startCheck = true;
-        start = System.currentTimeMillis();
-        
+        start = LocalDateTime.now();
     }
    
     void endMark()
     {
         endCheck = true;
-        end = System.currentTimeMillis();
+        end = LocalDateTime.now();
     }
    
     long currentTime()
     {
-    	return end-start;
+    	return ChronoUnit.SECONDS.between(start, LocalDateTime.now());
     }
     
     long resultTime()
     {
-        if(startCheck == true && endCheck == true)
-            time = end - start;
-        else
+        if(startCheck && endCheck) {
+            return ChronoUnit.MILLIS.between(start, end);
+        } else {
             System.out.print("BenchMark Failed. ");
-       
+        }
         return time;
     }
    

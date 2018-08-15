@@ -1,3 +1,5 @@
+package main.java;
+
 import java.util.ArrayList;
 
 
@@ -16,7 +18,7 @@ public class Vertex
 		   this.id = id;
 		   this.x_var = x_var;
 		   this.y_var = y_var;
-		   this.connectedVertices = new ArrayList<Edge>();
+		   this.connectedVertices = new ArrayList<>();
 		   this.edge       = null;  
 	   }
 	   
