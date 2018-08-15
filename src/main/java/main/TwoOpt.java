@@ -3,20 +3,21 @@ package main;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TwoOpt {
   private int[][] distances;
-  private ArrayList<Vertex> graph;
+  private List<Vertex> graph;
   private int secondsToRun;
   private LocalDateTime start;
 
-    TwoOpt(ArrayList<Vertex> g, int[][] d, int t) {
+    TwoOpt(List<Vertex> g, int[][] d, int t) {
         distances = d;
         graph = g;
         secondsToRun = t/2; // divide by two as impl has two opt running twice.
     }
 
-   private ArrayList<Vertex> runTwoOpt(boolean twoOptIterationB) {
+   private List<Vertex> runTwoOpt(boolean twoOptIterationB) {
         start = LocalDateTime.now();
         do {
             if (timeIsUp()) {
@@ -56,13 +57,13 @@ public class TwoOpt {
         return elapsedTime >= secondsToRun;
     }
 
-    ArrayList<Vertex> run() {
+    public List<Vertex> run() {
         graph = runTwoOpt(true);
         graph = runTwoOpt(false);
         return graph;
     }
 
-   private ArrayList<Vertex> TwoOptSwap(ArrayList<Vertex> route, int i, int k) {
+   private ArrayList<Vertex> TwoOptSwap(List<Vertex> route, int i, int k) {
 
         ArrayList<Vertex> newRoute = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class TwoOpt {
     }
 
 
-   private int calculateTotalDistance(ArrayList<Vertex> path) {
+   private int calculateTotalDistance(List<Vertex> path) {
         int totalDistance = 0;
         for (int i = 0; i < path.size() - 1; i++) {
             totalDistance += distances[path.get(i).getID()][path.get(i + 1).getID()];

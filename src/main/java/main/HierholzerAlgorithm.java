@@ -1,27 +1,27 @@
 package main;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class HierholzerAlgorithm {
     private HierholzerAlgorithm() {
     }
 
-    public static LinkedList<Vertex> run(ArrayList<Vertex> vertexGraph) {
-        LinkedList<Vertex> firstPath;
-        LinkedList<Vertex> currentTour = new LinkedList<>(vertexGraph);
+    public static List<Vertex> run(List<Vertex> vertexGraph) {
+        List<Vertex> firstPath;
+        List<Vertex> currentTour = new LinkedList<>(vertexGraph);
         firstPath = new LinkedList<>();
         while (currentTour.get(0).connectedVertices.size() != 0) {
-            LinkedList<Vertex> returnedPath = returnAPath(currentTour.get(0));
+            List<Vertex> returnedPath = returnAPath(currentTour.get(0));
             firstPath = runHelper(returnedPath);
         }
         return firstPath;
     }
 
-    private static LinkedList<Vertex> runHelper(LinkedList<Vertex> firstPath) {
+    private static List<Vertex> runHelper(List<Vertex> firstPath) {
         for (int i = 0; i < firstPath.size(); i++) {
             if (firstPath.get(i).connectedVertices.size() > 0) {
-                LinkedList<Vertex> addToPath;
+                List<Vertex> addToPath;
                 addToPath = returnAPath(firstPath.get(i));
                 int indexSaved = i + 1;
                 int addPathSize = addToPath.size();
@@ -36,8 +36,8 @@ public class HierholzerAlgorithm {
     }
 
 
-    private static LinkedList<Vertex> returnAPath(Vertex pathStart) {
-        LinkedList<Vertex> returnValue = new LinkedList<>();
+    private static List<Vertex> returnAPath(Vertex pathStart) {
+        List<Vertex> returnValue = new LinkedList<>();
         Vertex pathFinish = null;
         Vertex firstNode = pathStart;
         while (firstNode != pathFinish) {

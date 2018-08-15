@@ -3,6 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class PrimsAlgorithm {
 
@@ -16,7 +17,7 @@ public class PrimsAlgorithm {
 find the minimum-weight edge, and transfer it to the tree.
 3: Repeat step 2 (until all vertices are in the tree).
 * */	
-public static ArrayList<Vertex>  run(ArrayList<Vertex> unsortedList, int[][] distances)
+public static List<Vertex>  run(List<Vertex> unsortedList, int[][] distances)
 {
 	Comparator<Vertex> compareMethod = new VertexComparator();
 
@@ -33,7 +34,7 @@ public static ArrayList<Vertex>  run(ArrayList<Vertex> unsortedList, int[][] dis
 //sorts and checks each edge to make sure it is the smallest.
 //Sort is run BEFORE the new weights are assigned to insure that the new graph will be connected.
 //This is mainly because the initial initialization happens before the while loop.
-	ArrayList<Vertex> sortedList     = new ArrayList<>();
+	List<Vertex> sortedList     = new ArrayList<>();
 	while(!unsortedList.isEmpty())
 	{
 		Vertex pointConnected = unsortedList.get(0);

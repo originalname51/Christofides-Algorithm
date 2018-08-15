@@ -26,7 +26,7 @@ public class CompareMain {
             String oldTourFile = NAME_OF_OLD_TOUR + i + END_OF_OLD_TOUR;
             String newTourFile = NAME_OF_INPUT_FILE + i + END_OF_FILE;
             ChristofidesTour oldChristofidesTour = parseAnswer(oldTourFile);
-            ChristofidesTour newChristofidesTour = mainProgram.ChristofidesAlgorithm(newTourFile, 0);
+            ChristofidesTour newChristofidesTour = mainProgram.christofidesAlgorithm(newTourFile, 0);
             assertEquals(oldChristofidesTour.getTourCost(), newChristofidesTour.getTourCost());
             assertEqualsArray(oldChristofidesTour.getFinalTour(), newChristofidesTour.getFinalTour());
         }

@@ -16,21 +16,21 @@ public class mainProgram {
     public static void main(String[] args) throws IOException {
         String filenameThatWillBeParsed = args[0];
         int secondsToRunTwoOpt = args.length != 2 ? 0 : Integer.parseInt(args[1]);
-        ChristofidesAlgorithm(filenameThatWillBeParsed, secondsToRunTwoOpt);
+        christofidesAlgorithm(filenameThatWillBeParsed, secondsToRunTwoOpt);
     }
 
-    public static ChristofidesTour ChristofidesAlgorithm(String arg, int secondsToRunTwoOpt) throws IOException {
+    public static ChristofidesTour christofidesAlgorithm(String inputFilePath, int secondsToRunTwoOpt) throws IOException {
         Benchmark benchmark = new Benchmark();
         benchmark.startMark();
-        ArrayList<Vertex> theGraph = parseGraph(arg);
+        List<Vertex> theGraph = parseGraph(inputFilePath);
         int[][] distances = getDistances(theGraph);
-        ArrayList<Vertex> MinimumSpanningTree = PrimsAlgorithm.run(theGraph, distances);
-        createEvenlyVertexedEularianMultiGraphFromMST(MinimumSpanningTree, distances);
-        LinkedList<Vertex> eulerTour = HierholzerAlgorithm.run(MinimumSpanningTree);
-        ArrayList<Vertex> TSP = ShortCut.run(eulerTour);
-        TwoOpt TwoOpt = new TwoOpt(TSP, distances, secondsToRunTwoOpt);
-        TSP = TwoOpt.run();
-        ChristofidesTour finalAnswer = FinalAnswer(TSP, distances, arg);
+        List<Vertex> minimumSpanningTree = PrimsAlgorithm.run(theGraph, distances);
+        createEvenlyVertexedEularianMultiGraphFromMST(minimumSpanningTree, distances);
+        List<Vertex> eulerTour = HierholzerAlgorithm.run(minimumSpanningTree);
+        List<Vertex> travelingSalesPath = ShortCut.run(eulerTour);
+        TwoOpt twoOpt = new TwoOpt(travelingSalesPath, distances, secondsToRunTwoOpt);
+        travelingSalesPath = twoOpt.run();
+        ChristofidesTour finalAnswer = finalAnswer(travelingSalesPath, distances, inputFilePath);
         benchmark.endMark();
         System.out.println("Program took: " + benchmark.resultTime() + " ms");
         return finalAnswer;
@@ -50,7 +50,7 @@ public class mainProgram {
     }
 
     // function calculates distances between all points on the graph
-    private static int[][] getDistances(ArrayList<Vertex> graph) {
+    private static int[][] getDistances(List<Vertex> graph) {
         int[][] distanceGraph = new int[graph.size()][graph.size()];
         for (int i = 0; i < graph.size(); i++) {
             for (int j = 0; j < graph.size(); j++) {
@@ -72,9 +72,9 @@ public class mainProgram {
     but attempts something close to), and then reconnects the graph. Please note this creates a Eulerian Multigraph
     which means edges can be connected to each other twice. 2 edges "A-B" "A-B" can exist from the same main.java.Vertex.
      * */
-    private static ArrayList<Vertex> createEvenlyVertexedEularianMultiGraphFromMST(ArrayList<Vertex> minimumSpanningTree, int[][] distances) {
+    private static List<Vertex> createEvenlyVertexedEularianMultiGraphFromMST(List<Vertex> minimumSpanningTree, int[][] distances) {
 
-        ArrayList<Vertex> oddNumbers = minimumSpanningTree
+        List<Vertex> oddNumbers = minimumSpanningTree
                 .stream()
                 .filter(vertex -> vertex.connectedVertices.size() % 2 == 1)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -104,13 +104,9 @@ public class mainProgram {
         return minimumSpanningTree;
     }
 
-    private static ChristofidesTour FinalAnswer(ArrayList<Vertex> TSP, int[][] distances, String p) {
-        ChristofidesTour christofidesTour = new ChristofidesTour();
-        List<Integer> finalTour = new ArrayList<>();
-        int totalDistance = 0;
-
-        try {
-            PrintWriter writer = new PrintWriter((p + ".tour"));
+    private static ChristofidesTour finalAnswer(List<Vertex> TSP, int[][] distances, String p) throws FileNotFoundException {
+        try (PrintWriter writer = new PrintWriter((p + ".tour"))){
+            ChristofidesTour christofidesTour = new ChristofidesTour();
             int lineFormatting = 0;
             for (Vertex vertex : TSP) {
                 System.out.print(vertex.getID() + " ");
@@ -122,25 +118,26 @@ public class mainProgram {
             }
             System.out.println();
 
-            totalDistance = TSP.stream()
+            int totalDistance = TSP.stream()
                     .mapToInt
-                            (vertex -> TSP.indexOf(vertex) == TSP.size() - 1 ? 0 : distances[vertex.getID()][TSP.get(TSP.indexOf(vertex) + 1).getID()])
+                            (vertex -> TSP.indexOf(vertex) == TSP.size() - 1 ?
+                                    distances[TSP.get(0).getID()][TSP.get(TSP.size() - 1).getID()] //logic to connect end node to start node.
+                                  : distances[vertex.getID()][TSP.get(TSP.indexOf(vertex) + 1).getID()])
                     .sum();
-            totalDistance += distances[TSP.get(0).getID()][TSP.get(TSP.size() - 1).getID()]; //calculate the last edge from the end to the start, completing the tour.
-
             System.out.println("Total distance covered of the " + TSP.size() + " vertices is: " + totalDistance);
             writer.println(totalDistance);
-            for (Vertex vertex : TSP) {
-                finalTour.add(vertex.getID());
-                writer.println(vertex.getID());
-            }
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
+            List<Integer> finalTour = TSP
+                    .stream()
+                    .map(vertex -> {
+                        writer.println(vertex.getID());
+                        return vertex.getID();
+                    }).collect(Collectors.toCollection(ArrayList::new));
+
+            christofidesTour.setFinalTour(finalTour);
+            christofidesTour.setTourCost(totalDistance);
+            return christofidesTour;
         }
-        christofidesTour.setFinalTour(finalTour);
-        christofidesTour.setTourCost(totalDistance);
-        return christofidesTour;
     }
 }
 

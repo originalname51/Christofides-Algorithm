@@ -1,7 +1,7 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ShortCut {
@@ -10,7 +10,7 @@ public class ShortCut {
 	private ShortCut() {
 	}
 	
-public static ArrayList<Vertex> run(LinkedList<Vertex> tour) {
+public static List<Vertex> run(List<Vertex> tour) {
 	return new ArrayList<>(tour)
 			.stream()
 			.distinct() //for duplicated elements, the element appearing first in the encounter order is preserved.
