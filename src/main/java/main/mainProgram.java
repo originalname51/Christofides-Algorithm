@@ -82,15 +82,17 @@ public class mainProgram {
         while (!oddNumbers.isEmpty()) {
             int distance = Integer.MAX_VALUE;
             final Vertex parent = oddNumbers.get(0);
-            oddNumbers.remove(parent);
+
+            //Compare pointers to not use root node.
             int minDistanceToNextNode = oddNumbers
                     .stream()
-                    .mapToInt(vertex -> distances[parent.getID()][vertex.getID()])
+                    .mapToInt(vertex -> vertex == parent ? Integer.MAX_VALUE : distances[parent.getID()][vertex.getID()])
                     .min()
                     .getAsInt();
+
             Vertex child = oddNumbers
                     .stream()
-                    .filter(vertex -> distances[parent.getID()][vertex.getID()] == minDistanceToNextNode)
+                    .filter(vertex -> distances[parent.getID()][vertex.getID()] == minDistanceToNextNode && vertex != parent)
                     .findFirst()
                     .get();
 
