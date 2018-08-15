@@ -1,14 +1,15 @@
 package test.java;
 
 import main.java.ChristofidesTour;
-import main.java.Vertex;
 import main.java.mainProgram;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,25 +28,13 @@ public class CompareMain {
             String oldTourFile = NAME_OF_OLD_TOUR + i + END_OF_OLD_TOUR;
             String newTourFile = NAME_OF_INPUT_FILE + i + END_OF_FILE;
             ChristofidesTour oldChristofidesTour = parseAnswer(oldTourFile);
-            ChristofidesTour newChristofidesTour = mainProgram.ChristofidesAlgorithm(newTourFile);
+            ChristofidesTour newChristofidesTour = mainProgram.ChristofidesAlgorithm(newTourFile, 0);
             assertEquals(oldChristofidesTour.getTourCost(), newChristofidesTour.getTourCost());
             assertEqualsArray(oldChristofidesTour.getFinalTour(), newChristofidesTour.getFinalTour());
         }
     }
 
-
-    @Test
-    public void correctlyParseOldTour() throws IOException {
-
-        ChristofidesTour oldChristofidesTour = parseAnswer(NAME_OF_OLD_TOUR);
-        System.out.println(oldChristofidesTour.getTourCost());
-        for (Integer tourStop : oldChristofidesTour.getFinalTour()) {
-            System.out.println(tourStop);
-        }
-
-    }
-
-    static void assertEqualsArray(List<Integer> listOne, List<Integer> listTwo) {
+   private static void assertEqualsArray(List<Integer> listOne, List<Integer> listTwo) {
         for (int i = 0; i < listOne.size(); i++) {
             assertTrue(listOne.get(i).equals(listTwo.get(i)));
         }
@@ -54,20 +43,14 @@ public class CompareMain {
         }
     }
 
-    static ChristofidesTour parseAnswer(String in) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(in));
-        ArrayList<Vertex> graph = new ArrayList<Vertex>();
-        String line;
-        line = br.readLine();
-        int totalDistance = Integer.parseInt(line);
-        List<Integer> finalTour = new ArrayList<Integer>();
-        while ((line = br.readLine()) != null) {
-            Integer tourId = Integer.parseInt(line);
-            finalTour.add(tourId);
-        }
-        br.close();
-
-        return new ChristofidesTour(finalTour, totalDistance);
+   private static ChristofidesTour parseAnswer(String filePath) throws IOException {
+       try(Stream<String> stream = Files.lines(Paths.get(filePath))) {
+           List<Integer>  finalTour = stream.map(Integer::parseInt)
+                   .collect(Collectors.toCollection(ArrayList::new));
+           int totalDistance = finalTour.get(0);
+           finalTour.remove(0);
+           return new ChristofidesTour(finalTour, totalDistance);
+       }
     }
 
 

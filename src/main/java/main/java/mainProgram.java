@@ -1,12 +1,13 @@
 package main.java;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
 
@@ -14,44 +15,38 @@ public class mainProgram {
 
     public static void main(String[] args) throws IOException {
         String filenameThatWillBeParsed = args[0];
-        ChristofidesAlgorithm(filenameThatWillBeParsed);
+        int secondsToRunTwoOpt = args.length != 2 ? 0 : Integer.parseInt(args[1]);
+        ChristofidesAlgorithm(filenameThatWillBeParsed, secondsToRunTwoOpt);
     }
 
-    public static ChristofidesTour ChristofidesAlgorithm(String arg) throws IOException {
+    public static ChristofidesTour ChristofidesAlgorithm(String arg, int secondsToRunTwoOpt) throws IOException {
         Benchmark benchmark = new Benchmark();
-
         benchmark.startMark();
         ArrayList<Vertex> theGraph = parseGraph(arg);
         int[][] distances = getDistances(theGraph);
         ArrayList<Vertex> MinimumSpanningTree = PrimsAlgorithm.run(theGraph, distances);
         createEvenlyVertexedEularianMultiGraphFromMST(MinimumSpanningTree, distances);
-        LinkedList<Vertex> eulerTour =  HierholzerAlgorithm.run(MinimumSpanningTree);
+        LinkedList<Vertex> eulerTour = HierholzerAlgorithm.run(MinimumSpanningTree);
         ArrayList<Vertex> TSP = ShortCut.run(eulerTour);
-
-        double secondsToRunTwoOpt = 15;
-        TwoOpt TwoOpt = new TwoOpt(TSP,distances,secondsToRunTwoOpt);
+        TwoOpt TwoOpt = new TwoOpt(TSP, distances, secondsToRunTwoOpt);
         TSP = TwoOpt.run();
-
-        ChristofidesTour finalAnswer =  FinalAnswer(TSP, distances, arg);
+        ChristofidesTour finalAnswer = FinalAnswer(TSP, distances, arg);
         benchmark.endMark();
         System.out.println("Program took: " + benchmark.resultTime() + " ms");
-        return  finalAnswer;
+        return finalAnswer;
     }
 
-    static ArrayList<Vertex> parseGraph(String in) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(in));
-        ArrayList<Vertex> graph = new ArrayList<Vertex>();
-        String line;
-        while ((line = br.readLine()) != null) {
-            StringTokenizer st = new StringTokenizer(line);
-            int id, x, y;
-            id = Integer.parseInt(st.nextElement().toString());
-            x = Integer.parseInt(st.nextElement().toString());
-            y = Integer.parseInt(st.nextElement().toString());
-            graph.add(new Vertex(id, x, y));
+  private static ArrayList<Vertex> parseGraph(String fileName) throws IOException {
+        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+            return stream.map(line -> {
+                String brokenUpLine[] = line.trim().split("\\s+");  //trim leading whitespace before splitting on spaces.
+                int id, x, y;
+                id = Integer.parseInt(brokenUpLine[0]);
+                x = Integer.parseInt(brokenUpLine[1]);
+                y = Integer.parseInt(brokenUpLine[2]);
+                return new Vertex(id, x, y);
+            }).collect(Collectors.toCollection(ArrayList::new));
         }
-        br.close();
-        return graph;
     }
 
     // function calculates distances between all points on the graph
@@ -67,7 +62,7 @@ public class mainProgram {
 
     // function that calculates the difference in location using A^2 + B^2 = C^2
     private static int difference(Vertex a, Vertex b) {
-        long difference =  Math
+        long difference = Math
                 .round(Math.sqrt(Math.pow((a.getX() - b.getX()), 2) + Math.pow((a.getY() - b.getY()), 2)));
         return toIntExact(difference);
     }
@@ -77,25 +72,25 @@ public class mainProgram {
     but attempts something close to), and then reconnects the graph. Please note this creates a Eulerian Multigraph
     which means edges can be connected to each other twice. 2 edges "A-B" "A-B" can exist from the same main.java.Vertex.
      * */
-    static ArrayList<Vertex> createEvenlyVertexedEularianMultiGraphFromMST(ArrayList<Vertex> minimumSpanningTree, int[][] distances) {
+    private static ArrayList<Vertex> createEvenlyVertexedEularianMultiGraphFromMST(ArrayList<Vertex> minimumSpanningTree, int[][] distances) {
 
         ArrayList<Vertex> oddNumbers = minimumSpanningTree
                 .stream()
                 .filter(vertex -> vertex.connectedVertices.size() % 2 == 1)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        while (oddNumbers.isEmpty() == false) {
+        while (!oddNumbers.isEmpty()) {
             int distance = Integer.MAX_VALUE;
             final Vertex parent = oddNumbers.get(0);
             oddNumbers.remove(parent);
-            int minDistance = oddNumbers
+            int minDistanceToNextNode = oddNumbers
                     .stream()
                     .mapToInt(vertex -> distances[parent.getID()][vertex.getID()])
                     .min()
                     .getAsInt();
             Vertex child = oddNumbers
                     .stream()
-                    .filter(vertex -> distances[parent.getID()][vertex.getID()] == minDistance)
+                    .filter(vertex -> distances[parent.getID()][vertex.getID()] == minDistanceToNextNode)
                     .findFirst()
                     .get();
 
@@ -106,13 +101,12 @@ public class mainProgram {
             oddNumbers.remove(parent);
             oddNumbers.remove(child);
         }
-
         return minimumSpanningTree;
     }
 
-    static ChristofidesTour FinalAnswer(ArrayList<Vertex> TSP, int[][] distances, String p) {
+    private static ChristofidesTour FinalAnswer(ArrayList<Vertex> TSP, int[][] distances, String p) {
         ChristofidesTour christofidesTour = new ChristofidesTour();
-        List<Integer> finalTour = new ArrayList<Integer>();
+        List<Integer> finalTour = new ArrayList<>();
         int totalDistance = 0;
 
         try {
@@ -130,7 +124,7 @@ public class mainProgram {
 
             totalDistance = TSP.stream()
                     .mapToInt
-                            (vertex -> TSP.indexOf(vertex) == TSP.size()-1 ? 0 : distances[vertex.getID()][TSP.get(TSP.indexOf(vertex)+1).getID()])
+                            (vertex -> TSP.indexOf(vertex) == TSP.size() - 1 ? 0 : distances[vertex.getID()][TSP.get(TSP.indexOf(vertex) + 1).getID()])
                     .sum();
             totalDistance += distances[TSP.get(0).getID()][TSP.get(TSP.size() - 1).getID()]; //calculate the last edge from the end to the start, completing the tour.
 

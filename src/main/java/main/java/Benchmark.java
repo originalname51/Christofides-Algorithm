@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 public class Benchmark
 {
     private LocalDateTime start;
-    private long end = 0;
+    private LocalDateTime end;
     private long time = 0;
     private boolean startCheck = false;
     private boolean endCheck = false;
@@ -25,6 +25,7 @@ public Benchmark()
     void endMark()
     {
         endCheck = true;
+        end = LocalDateTime.now();
     }
    
     long currentTime()
@@ -34,8 +35,8 @@ public Benchmark()
     
     long resultTime()
     {
-        if(startCheck == true && endCheck == true) {
-            return ChronoUnit.MILLIS.between(start, LocalDateTime.now());
+        if(startCheck && endCheck) {
+            return ChronoUnit.MILLIS.between(start, end);
         } else {
             System.out.print("BenchMark Failed. ");
         }
