@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.toIntExact;
+
 public class mainProgram {
 
     public static void main(String[] args) throws IOException {
@@ -65,9 +67,9 @@ public class mainProgram {
 
     // function that calculates the difference in location using A^2 + B^2 = C^2
     private static int difference(Vertex a, Vertex b) {
-        int difference = (int) Math
+        long difference =  Math
                 .round(Math.sqrt(Math.pow((a.getX() - b.getX()), 2) + Math.pow((a.getY() - b.getY()), 2)));
-        return difference;
+        return toIntExact(difference);
     }
 
     /*
