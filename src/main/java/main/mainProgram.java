@@ -36,7 +36,7 @@ public class mainProgram {
         return finalAnswer;
     }
 
-  private static ArrayList<Vertex> parseGraph(String fileName) throws IOException {
+  private static List<Vertex> parseGraph(String fileName) throws IOException {
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
             return stream.map(line -> {
                 String brokenUpLine[] = line.trim().split("\\s+");  //trim leading whitespace before splitting on spaces.
