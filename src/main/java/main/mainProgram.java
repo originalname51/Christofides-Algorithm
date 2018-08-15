@@ -106,7 +106,6 @@ public class mainProgram {
 
     private static ChristofidesTour finalAnswer(List<Vertex> TSP, int[][] distances, String p) throws FileNotFoundException {
         try (PrintWriter writer = new PrintWriter((p + ".tour"))){
-            ChristofidesTour christofidesTour = new ChristofidesTour();
             int lineFormatting = 0;
             for (Vertex vertex : TSP) {
                 System.out.print(vertex.getID() + " ");
@@ -133,10 +132,7 @@ public class mainProgram {
                         writer.println(vertex.getID());
                         return vertex.getID();
                     }).collect(Collectors.toCollection(ArrayList::new));
-
-            christofidesTour.setFinalTour(finalTour);
-            christofidesTour.setTourCost(totalDistance);
-            return christofidesTour;
+            return new ChristofidesTour(finalTour, totalDistance);
         }
     }
 }
