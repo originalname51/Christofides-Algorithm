@@ -1,7 +1,7 @@
-package test.java;
+package test;
 
-import main.java.ChristofidesTour;
-import main.java.mainProgram;
+import main.ChristofidesTour;
+import main.mainProgram;
 import org.junit.Test;
 
 import java.io.IOException;
